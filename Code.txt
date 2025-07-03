@@ -1,0 +1,246 @@
+create database [TransplantUnity Network]
+go
+use [TransplantUnity Network]
+create table Organ
+(
+name char(50) constraint organ_pk primary key,
+durability char(50)
+)
+create table HIV
+(
+name char(50) constraint HIV_pk primary key,
+organ_name char(50),
+constraint HIV_fk foreign key (organ_name) references Organ (name)
+)
+create table Area
+(
+name char(50),
+code char(50),
+constraint area_pk primary key (name,code)
+)
+create table Hospital
+(
+ID char(50) constraint hospital_pk primary key,
+name char(50),
+area_name char(50),
+area_code char(50),
+constraint hospital_fk foreign key (area_name, area_code) references Area (name, code)
+)
+create table [Blood Group]
+(
+blood_type char(50),
+rh_factor char(50),
+constraint blood_pk primary key (blood_type, rh_factor)
+)
+create table [Medical Record]
+(
+genetic_disease char(50),
+acquired_disease char(50),
+allergy char(50),
+constraint medical_record_pk primary key (genetic_disease, acquired_disease, allergy)
+)
+create table Doctor
+(
+ID char(50) constraint doctor_pk primary key,
+name char(50),
+hospital_id char(50),
+salary int,
+speciality char(50),
+constraint doctor_fk foreign key (hospital_id) references Hospital (ID)
+)
+create table [Operation Room]
+(
+room_no int,
+building char(50),
+hospital_id char(50),
+constraint or_pk primary key (room_no, building),
+constraint or_fk foreign key (hospital_id) references Hospital (ID)
+)
+create table Donor
+(
+ID char(50) constraint donor_pk primary key,
+name char(50),
+age int,
+gender char(50),
+DOD DATETIME,
+hospital_id char(50),
+genetic_disease char(50),
+acquired_disease char(50),
+allergy char(50),
+blood_type char(50),
+rh_factor char(50),
+constraint donor_fk1 foreign key (hospital_id) references Hospital (ID),
+constraint donor_fk2 foreign key (genetic_disease, acquired_disease, allergy) references [Medical Record] (genetic_disease, acquired_disease, allergy),
+constraint donor_fk3 foreign key (blood_type, rh_factor) references [Blood Group] (blood_type, rh_factor)
+)
+create table Patient
+(
+ID char(50) constraint patient_pk primary key,
+name char(50),
+age char(50),
+gender char(50),
+damage_name char(50),
+damage_stage char(50),
+hospital_id char(50),
+genetic_disease char(50),
+acquired_disease char(50),
+allergy char(50),
+blood_type char(50),
+rh_factor char(50),
+constraint patient_fk2 foreign key (hospital_id) references Hospital (ID),
+constraint patient_fk3 foreign key (genetic_disease, acquired_disease, allergy) references [Medical Record] (genetic_disease, acquired_disease, allergy),
+constraint patient_fk4 foreign key (blood_type, rh_factor) references [Blood Group] (blood_type, rh_factor)
+)
+create table Consultant
+(
+patient_id char(50),
+doctor_id char (50),
+constraint con_pk primary key (patient_id, doctor_id),
+constraint con_fk1 foreign key (patient_id) references Patient (ID),
+constraint con_fk2 foreign key (doctor_id) references Doctor (ID)
+)
+create table Donates
+(
+donor_id char(50),
+organ_name char (50),
+constraint don_pk primary key (donor_id, organ_name),
+constraint don_fk1 foreign key (donor_id) references Donor (ID),
+constraint don_fk2 foreign key (organ_name) references Organ (name)
+)
+create table Surgery
+(
+name char(50),
+patient_id char(50),
+doctor_id char(50),
+donor_id char(50),
+room_no int,
+building char(50),
+datetime DATETIME,
+constraint surgery_pk primary key (name, patient_id),
+constraint surgery_fk1 foreign key (doctor_id) references Doctor (ID),
+constraint surgery_fk2 foreign key (patient_id) references Patient (ID),
+constraint surgery_fk3 foreign key (donor_id) references Donor (ID),
+constraint surgery_fk4 foreign key (room_no, building) references [Operation Room] (room_no, building)
+)
+
+insert into Organ
+values
+('Liver','9 hours'),
+('Kidney','24-36 hours'),
+('Lungs','1-1.5 hours'),
+('Bone Marrow','7 days'),
+('Pancreas','5 hours')
+
+insert into HIV
+values
+('Liver_cancer','Liver'),
+('Kidney_stone','Kidney'),
+('Lungs_damage','Lungs'),
+('Leukemia','Bone Marrow'),
+('Pancreatic Cancer','Pancreas')
+
+insert into Area
+values
+('Mohakhali','Dhaka: 1212'),
+('Shyamoli','Dhaka: 1207'),
+('Dhaka Cantonment','Dhaka: 1206'),
+('Gendaria','Dhaka: 1204'),
+('Gulshan','Dhaka: 1212')
+
+insert into Hospital
+values
+('1','Asgar Ali Hospital','Gendaria','Dhaka: 1204'),
+('2','Dhaka CMH Cancer Center','Dhaka Cantonment','Dhaka: 1206'),
+('3','National Institute of Cancer Research & Hospital','Mohakhali','Dhaka: 1212'),
+('4','Bangladesh Specialized Hospital Ltd. (BSHL)','Shyamoli','Dhaka: 1207'),
+('5','United Hospital','Gulshan','Dhaka: 1212')
+
+insert into [Blood Group]
+values
+('A','Positive(+)'),
+('A','Negative(-)'),
+('B','Positive(+)'),
+('B','Negative(-)'),
+('O','Positive(+)'),
+('O','Negative(-)'),
+('AB','Positive(+)'),
+('AB','Negative(-)')
+
+insert into [Medical Record]
+values
+('Diabetes',NULL,'Penicillin'),
+('Diabetes',NULL,'Latex'),
+('Diabetes','STD','Penicillin'),
+('Diabetes','STD','Latex'),
+('Cystic fibrosis',NULL,'Penicillin'),
+('Cystic fibrosis',NULL,'Latex'),
+('Cystic fibrosis','STD','Penicillin'),
+('Cystic fibrosis','STD','Latex')
+
+insert into Doctor
+values
+('101','Dr. Md. Nahid Hossen','1',100000,'Oncology'),
+('102','Prof. Brig. Gen. Dr. Kumrul Hasan','2',150000,'Psychiatry'),
+('103','Prof. Dr. Nazrina Khatun','3',200000,'Oncology'),
+('104','Dr. Mohammad Mahbub Hossain','4',13300,'Radiology & Imaging'),
+('105','Dr. Kazi Ali Hassan','5',60000,'Clinical Endocrinology')
+
+insert into [Operation Room]
+values
+(701,'Main','2'),
+(501,'Main','3'),
+(611,'Main','1'),
+(1000,'Main','5'),
+(721,'Main','4')
+
+insert into Donor
+values
+('201','Dana Islam',30,'Female','2023-04-10 23:20:40','2',NULL,NULL,NULL,'O','Negative(-)'),
+('202','Shohag Hossain',20,'Male','2023-04-15 19:23:20','1',NULL,NULL,NULL,'A','Positive(+)'),
+('203','Bithi Jahan',27,'Female','2023-04-12 04:13:33','4',NULL,NULL,NULL,'B','Negative(-)'),
+('204','Jane Doe',22,'Female','2023-04-11 10:29:20','3',NULL,NULL,NULL,'AB','Positive(+)'),
+('205','John Doe',19,'Male','2023-04-14 22:50:59','5',NULL,NULL,NULL,'A','Negative(-)')
+
+insert into Patient
+values
+('501','Sara Islam',25,'Female','Lung Cancer','Last Stage','2','Diabetes','HIV','Penicillin','A','Positive(+)'),
+('502','Atik Islam',23,'Male','Liver Cancer','Initial Stage','1','Cystic fibrosis','HIV','Latex','AB','Negative(-)'),
+('503','Shihab Hasan',15,'Male','Kidney Cancer','Second Stage','3','Cystic fibrosis','HIV','Penicillin','AB','Positive(+)'),
+('504','Lamia Bushra',20,'Female','Pancreatic Cancer','Third Stage','5','Cystic fibrosis','STD','Latex','A','Negative(-)'),
+('505','Ashique Islam',25,'Male','Leukemia','Fourth Stage','4','Diabetes','STD','Penicillin','B','Negative(-)')
+
+insert into Consultant
+values
+('501','101'),
+('502','104'),
+('503','101')
+
+insert into Donates
+values
+('201','Liver'),
+('202','Lungs'),
+('203','Bone Marrow'),
+('204','Kidney'),
+('205','Pancreas')
+
+insert into Surgery
+values
+('Lungs Transplant','501','101','202',701,'Main','2023-04-15 19:23:20'),
+('Liver Transplant','502','103','201',721,'Main','2023-04-11 22:20:22'),
+('Bone Marrow Transplant','505','103','203',701,'Main','2023-04-12 04:13:33'),
+('Pancreas Transplant','504','101','205',701,'Main','2023-04-14 22:50:59'),
+('Kidney Transplant','503','103','204',701,'Main','2023-04-11 10:29:20')
+
+-- Select statements
+select * from Donor
+select * from HIV
+select * from Area
+select * from Hospital
+select * from [Blood Group]
+select * from [Medical Record]
+select * from Doctor
+select * from [Operation Room]
+select * from Patient
+select * from Consultant
+select * from Donates
+select * from Surgery
